@@ -1,0 +1,34 @@
+{
+  "name": "sitemapscraper",
+  "version": "1.0.0",
+  "description": "Scrapes a sitemap and outputs SEO results",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TaylorAckley/SitemapScraper.git"
+  },
+  "keywords": [
+    "sitemap",
+    "sitemaps",
+    "scraper",
+    "seo"
+  ],
+  "author": "taylorackley@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TaylorAckley/SitemapScraper/issues"
+  },
+  "homepage": "https://github.com/TaylorAckley/SitemapScraper#readme",
+  "dependencies": {
+    "request": "^2.83.0",
+    "request-promise": "^4.2.2",
+    "x-ray": "^2.3.2",
+    "x-ray-phantom": "^1.0.1"
+  },
+  "devDependencies": {
+    "xml2js": "^0.4.19"
+  }
+}
