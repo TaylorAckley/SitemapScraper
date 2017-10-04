@@ -9,36 +9,17 @@ const Xray = require('x-ray');
 const x = Xray()
     .driver(phantom());
 
-
-r('https://s3-us-west-2.amazonaws.com/ackley-landfill/sitemap.xml')
-    .then((res) => {
-        fs.writeFileSync('response.json', res);
-        let parser = new xml2js.Parser();
-        return parser.parseString(res, function (err, result) {
-            if (err) {
-                console.log(err);
-            }
-            let urls = [];
-            //result.
-            console.log(result.urlset.url.length);
-            fs.writeFileSync('result.json', JSON.stringify(result.urlset.url));
-            console.log('Done');
-        });
-    })
-    .catch((err) => {
-        console.log(err);
-    });
-
 class Scraper {
     constructor(options) {
         this.options = options;
     }
 
     go() {
-        return -1;
+        this._getSiteMap();
+        return
     }
 
-    getSiteMap() {
+    _getSiteMap() {
         r(this.options.uri)
             .then((res) => {
                 return res;
@@ -62,5 +43,6 @@ class Scraper {
         payload.urlset.url.forEach((e) => {
             _urls.push(e.loc[0]);
         }, this);
+        return _urls;
     }
 }
