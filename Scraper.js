@@ -13,7 +13,7 @@ const x = Xray()
     .driver(phantom({
         XSSAuditingEnabled: true,
         loadImages: false,
-        webSecurityEnabled: false
+        webSecurity: false
     }))
     .concurrency(3)
     .throttle(3, 500);
@@ -27,8 +27,11 @@ class Scraper {
         return new P((resolve, reject) => {
             this._getURLS()
                 .then((urls) => {
-                    this._getDataFromURL(urls);
-                    resolve(urls);
+                    this._getDataFromURL(urls)
+                        .then((data) => {
+                            resolve(data);
+                        });
+
                 })
                 .catch((err) => {
                     reject(err);
@@ -38,21 +41,18 @@ class Scraper {
 
     _getDataFromURL(urls) {
         return new P((resolve, reject) => {
-            console.log(urls.length);
-
-            //urls.forEach((url) => {
-            // console.log(url);
-            x('https://google.com', 'title')((err, obj) => {
-                if (err) {
-                    console.log('Raising Error');
-                    console.log(err);
-                }
-                console.log(obj);
+            urls.forEach((url) => {
+                x(urls, 'title')((err, obj) => {
+                    if (err) {
+                        console.log('Raising Error');
+                        console.log(err);
+                        return reject(err);
+                    }
+                    console.log('**//**');
+                    console.log(obj);
+                    resolve(obj);
+                });
             });
-
-
-            //});
-
         });
     }
 
