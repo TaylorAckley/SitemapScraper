@@ -27,10 +27,19 @@ class Scraper {
         return new P((resolve, reject) => {
             this._getURLS()
                 .then((urls) => {
-                    this._getDataFromURL(urls)
+                    this._loop(urls)
                         .then((data) => {
-                            resolve(data);
+                            let payload = 'URL, Title \n';
+                            for (let i = 0; i > data.length; i++) {
+                                payload += this._formatRow(data[i]);
+                            }
+                            fs.writeFileSync('result.csv', payload);
+                            resolve(1);
+                        })
+                        .catch((err) => {
+                            reject(err);
                         });
+
 
                 })
                 .catch((err) => {
@@ -39,19 +48,43 @@ class Scraper {
         });
     }
 
-    _getDataFromURL(urls) {
+    _loop(urls) {
         return new P((resolve, reject) => {
-            urls.forEach((url) => {
-                x(urls, 'title')((err, obj) => {
-                    if (err) {
-                        console.log('Raising Error');
-                        console.log(err);
-                        return reject(err);
-                    }
-                    console.log('**//**');
-                    console.log(obj);
-                    resolve(obj);
-                });
+            let data = [];
+            for (let i = 0; i < urls.length; i++) {
+                this._getDataFromURL(urls[i])
+                    .then((_payload) => {
+                        data.push(_payload);
+                    })
+                    .catch((err) => {
+                        reject(err);
+                    });
+                resolve(data);
+            }
+
+        });
+
+    }
+
+    _formatRow(row) {
+        return `{$row.url}, {row.title}`;
+    }
+
+    _getDataFromURL(url) {
+        return new P((resolve, reject) => {
+            x(url, 'title')((err, obj) => {
+                if (err) {
+                    console.log('Raising Error');
+                    console.log(err);
+                    return reject(err);
+                }
+                console.log('**//**\n', url);
+                console.log(obj);
+                let _payload = {
+                    url: url,
+                    title: obj
+                }
+                resolve(_payload);
             });
         });
     }
