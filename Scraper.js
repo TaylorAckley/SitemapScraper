@@ -15,8 +15,8 @@ const x = Xray()
         loadImages: false,
         webSecurity: false
     }))
-    .concurrency(3)
-    .throttle(3, 500);
+    .concurrency(8)
+    .throttle(10, 500);
 
 class Scraper {
     constructor(options) {
@@ -29,12 +29,21 @@ class Scraper {
                 .then((urls) => {
                     this._loop(urls)
                         .then((data) => {
+                            console.log('Num. URLS: ', data.length);
                             let payload = 'URL, Title \n';
-                            for (let i = 0; i > data.length; i++) {
+                            for (let i = 0; i < data.length; i++) {
+                                console.log(15);
                                 payload += this._formatRow(data[i]);
+                                console.log(payload.length);
+                                console.log('Checker: ' + i + ' of ' + data.length);
+                                if (i === data.length) {
+                                    console.log('Writing results to file');
+                                    fs.writeFileSync('result.csv', payload);
+                                    resolve(1);
+                                }
                             }
-                            fs.writeFileSync('result.csv', payload);
-                            resolve(1);
+
+
                         })
                         .catch((err) => {
                             reject(err);
@@ -52,7 +61,8 @@ class Scraper {
         return new P((resolve, reject) => {
             let data = [];
             for (let i = 0; i < urls.length; i++) {
-                this._getDataFromURL(urls[i])
+                console.log(`Requesting ${i} of ${urls.length}`);
+                this._getDataFromURL(urls[i], i, urls.length)
                     .then((_payload) => {
                         data.push(_payload);
                     })
@@ -67,10 +77,10 @@ class Scraper {
     }
 
     _formatRow(row) {
-        return `{$row.url}, {row.title}`;
+        return `{$row.url}, {row.title}\n`;
     }
 
-    _getDataFromURL(url) {
+    _getDataFromURL(url, i, len) {
         return new P((resolve, reject) => {
             x(url, 'title')((err, obj) => {
                 if (err) {
@@ -78,12 +88,12 @@ class Scraper {
                     console.log(err);
                     return reject(err);
                 }
-                console.log('**//**\n', url);
+                console.log(`** Processing ${i} of ${len}\n`, url);
                 console.log(obj);
                 let _payload = {
                     url: url,
                     title: obj
-                }
+                };
                 resolve(_payload);
             });
         });

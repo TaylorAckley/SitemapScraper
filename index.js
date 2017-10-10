@@ -3,7 +3,7 @@ const Scraper = require('./Scraper');
 const utils = require('./utils');
 
 let options = {
-    uri: 'https://s3-us-west-2.amazonaws.com/ackley-landfill/sitemap.xml'
+    uri: 'https://s3-us-west-2.amazonaws.com/ackley-landfill/sitemap.sm.xml'
 };
 
 let scraper = new Scraper(options);
