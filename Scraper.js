@@ -21,29 +21,25 @@ const x = Xray()
 class Scraper {
     constructor(options) {
         this.options = options;
+        this.header = 'URL, Title\ n';
+        this.job = {
+            payload: [],
+            processing: false,
+            length: 0
+        };
     }
 
     go() {
         return new P((resolve, reject) => {
+            this.payload = [];
             this._getURLS()
                 .then((urls) => {
                     this._loop(urls)
-                        .then((data) => {
-                            console.log('Num. URLS: ', data.length);
-                            let payload = 'URL, Title \n';
-                            for (let i = 0; i < data.length; i++) {
-                                console.log(15);
-                                payload += this._formatRow(data[i]);
-                                console.log(payload.length);
-                                console.log('Checker: ' + i + ' of ' + data.length);
-                                if (i === data.length) {
-                                    console.log('Writing results to file');
-                                    fs.writeFileSync('result.csv', payload);
-                                    resolve(1);
-                                }
-                            }
-
-
+                        .then(() => {
+                            this.runWatcher()
+                                .then(() => {
+                                    resolve(true)
+                                });
                         })
                         .catch((err) => {
                             reject(err);
@@ -57,19 +53,51 @@ class Scraper {
         });
     }
 
+    /*
+
+                            .then((data) => {
+                                console.log('Num. URLS: ', data.length);
+                                let payload = 'URL, Title \n';
+                                for (let i = 0; i < data.length; i++) {
+                                    console.log(15);
+                                    payload += this._formatRow(data[i]);
+                                    console.log(payload.length);
+                                    console.log('Checker: ' + i + ' of ' + data.length);
+                                    if (i === data.length) {
+                                        console.log('Writing results to file');
+                                        fs.writeFileSync('result.csv', payload);
+                                        resolve(1);
+                                    }
+                                }
+
+
+                            })
+    */
+
+    runWatcher() {
+
+    }
+
+    _write() {
+        fs.writeFile('log.txt', 'Hello Node', function (err) {
+            if (err) throw err;
+            console.log('It\'s saved!');
+        }); // => message.txt erased, contains only 'Hello Node'
+    }
+
     _loop(urls) {
         return new P((resolve, reject) => {
-            let data = [];
+            this.job.processing = true;
             for (let i = 0; i < urls.length; i++) {
                 console.log(`Requesting ${i} of ${urls.length}`);
                 this._getDataFromURL(urls[i], i, urls.length)
                     .then((_payload) => {
-                        data.push(_payload);
+                        this.payload.push(_payload);
                     })
                     .catch((err) => {
                         reject(err);
                     });
-                resolve(data);
+                resolve();
             }
 
         });
